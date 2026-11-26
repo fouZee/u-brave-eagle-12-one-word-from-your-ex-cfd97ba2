@@ -12,6 +12,11 @@
 // true, not because it is mean. "Temporary" leads the first draft: the
 // whole relationship summed up as a placeholder — funny because it hurts,
 // relatable because everyone has been someone's "for now".
+//
+// Revision: added "Doormat" to the shortlist — it outscores the old
+// winner on the laugh (5 vs 4): a doormat is a punchline and a confession
+// in one word, the person who let themselves be walked on and knows it.
+// Validation hardened with a round-trip read-back of the written file.
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 
@@ -25,6 +30,14 @@ type Candidate = {
 };
 
 const CANDIDATES: Candidate[] = [
+  {
+    word: "Doormat",
+    laugh: 5,
+    sting: 4,
+    instant: 5,
+    relatable: 4,
+    note: "A punchline and a confession in one word: the person who let themselves be walked on — and knows it. Funnier than Temporary because the image lands before the hurt does.",
+  },
   {
     word: "Temporary",
     laugh: 4,
@@ -108,6 +121,11 @@ function main(): void {
   const outPath = process.env.OUTPUT_PATH ?? "/output/entry.txt";
   mkdirSync(dirname(outPath), { recursive: true });
   writeFileSync(outPath, word, "utf8");
+  // Round-trip read-back: the file must read back exactly the picked word.
+  const back = readFileSync(outPath, "utf8");
+  if (back !== word) {
+    throw new Error("Write-back verification failed: entry.txt does not match the picked word.");
+  }
   console.log(`wrote ${word.length}-char entry to ${outPath}: ${word}`);
 }
 
