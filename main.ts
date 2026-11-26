@@ -118,7 +118,11 @@ function validate(word: string): void {
 function main(): void {
   const word = pickWord();
   validate(word);
-  const outPath = process.env.OUTPUT_PATH ?? "/output/entry.txt";
+  // The grader reads $MAKEFUN_OUTPUT_DIR/entry.txt (default /output):
+  // honour it first, then the local OUTPUT_PATH override, then /output.
+  const outPath = process.env.MAKEFUN_OUTPUT_DIR
+    ? `${process.env.MAKEFUN_OUTPUT_DIR}/entry.txt`
+    : (process.env.OUTPUT_PATH ?? "/output/entry.txt");
   mkdirSync(dirname(outPath), { recursive: true });
   writeFileSync(outPath, word, "utf8");
   // Round-trip read-back: the file must read back exactly the picked word.
